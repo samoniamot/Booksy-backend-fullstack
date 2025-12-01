@@ -1,10 +1,13 @@
 package com.booksy.config;
 
 import com.booksy.model.Libro;
+import com.booksy.model.Usuario;
 import com.booksy.repository.LibroRepository;
+import com.booksy.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 /**
@@ -17,14 +20,51 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired
     private LibroRepository libroRepository;
     
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    
     @Value("${app.base-url:http://localhost:8080}")
     private String baseUrl;
     
     @Override
     public void run(String... args) throws Exception {
+        inicializarUsuarios();
+        inicializarLibros();
+    }
+    
+    private void inicializarUsuarios() {
+        // crear usuario admin si no existe
+        if (!usuarioRepository.existsByEmail("admin@booksy.com")) {
+            Usuario admin = new Usuario(
+                "admin@booksy.com",
+                passwordEncoder.encode("admin123"),
+                "administrador",
+                "admin"
+            );
+            usuarioRepository.save(admin);
+            System.out.println("usuario admin creado");
+        }
+        
+        // crear usuario normal de prueba si no existe
+        if (!usuarioRepository.existsByEmail("usuario@booksy.com")) {
+            Usuario usuario = new Usuario(
+                "usuario@booksy.com",
+                passwordEncoder.encode("usuario123"),
+                "usuario prueba",
+                "user"
+            );
+            usuarioRepository.save(usuario);
+            System.out.println("usuario de prueba creado");
+        }
+    }
+    
+    private void inicializarLibros() {
         // solo agregar datos si la base esta vacia
         if (libroRepository.count() == 0) {
-            System.out.println("Inicializando datos de libros...");
+            System.out.println("inicializando datos de libros");
             
             String imgBase = baseUrl + "/images/";
             
@@ -99,7 +139,7 @@ public class DataInitializer implements CommandLineRunner {
                 26990
             ));
             
-            System.out.println("Datos inicializados correctamente!");
+            System.out.println("datos de libros inicializados");
         }
     }
 }
