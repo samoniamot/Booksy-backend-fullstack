@@ -42,7 +42,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // rutas publicas
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/swagger-ui/**", "/api-docs/**", "/swagger-ui.html").permitAll()
+                .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/v3/api-docs.yaml").permitAll()
                 .requestMatchers("/images/**").permitAll()
                 // libros lectura es publico
                 .requestMatchers(HttpMethod.GET, "/api/libros/**").permitAll()
